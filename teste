@@ -1,0 +1,33 @@
+import mne
+
+raw = mne.io.read_raw_edf(r'C:\Users\Camila\OneDrive - Universidade Federal do Pará - UFPA\Documentos\LABNEP\EEG TESTE\sampleData.edf', preload=True)
+
+raw_data = raw.get_data() #class numpy ndarray
+#shape (25,55200)
+
+print("channels:",str(len(raw_data)))
+print("samples: ",str(len(raw_data[0]))) #electrode 0
+
+
+#raw.copy().pick_types(meg=False, stim=True).plot(start=3, duration=6) 
+#has no triggers
+
+raw.plot(start=5, duration=1, scalings='auto')
+
+
+#power spectral density
+raw.plot_psd(fmax=100); 
+
+#clear spike at 60 Hz - freq of AC electrical service
+#power is highest at the lowest frequencies, the dropoff is not linear
+
+low_cut = 0.1
+hi_cut = 30
+raw_filt = raw.copy().filter(low_cut, hi_cut)
+#chain the .copy() because .filter() modifies the data in place, rather 
+#than creating a new filtered copy
+
+raw_filt.plot_psd(fmax=100); #drop in power above 30Hz cutoff
+#the spike at 60hz is reduced
+
+raw_filt.plot(start=5, duration=1, scalings='auto')
